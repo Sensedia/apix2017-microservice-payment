@@ -1,7 +1,7 @@
 target/
 !.mvn/wrapper/maven-wrapper.jar
 
-SDK-API-OrderManagement-V1-Java
+SDK-API-OrderManagement-V1-Java/
 
 ### STS ###
 .apt_generated
