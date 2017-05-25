@@ -48,8 +48,7 @@ public class PaymentScheduler {
 			public void run() {
 				PaymentEntity paymentEntity = paymentRepository.findById(orderId);
 				try {
-					//boolean isPaid = paymentService.isPaid(orderId, paymentEntity.getPaymentProvider());
-					boolean isPaid = true;
+					boolean isPaid = paymentService.isPaid(orderId, paymentEntity.getPaymentProvider());
 
 					if(isPaid){
 						PaymentBody paymentBody = new PaymentBody();
