@@ -12,8 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sensedia.apix.payment.entity.PaymentEntity;
+import com.sensedia.apix.payment.entity.json.PaymentBody;
 import com.sensedia.apix.payment.service.PaymentRepository;
+import com.sensedia.apix.payment.service.PaymentService;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -29,6 +32,9 @@ public class PaymentScheduler {
 	private PaymentRepository paymentRepository;
 
 	@Autowired
+	private PaymentService paymentService;
+
+	@Autowired
 	private TaskScheduler taskScheduler;
 
 	private OkHttpClient client = new OkHttpClient();
@@ -40,21 +46,28 @@ public class PaymentScheduler {
 		scheduledFutureMap.put(orderId, taskScheduler.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run() {
-				List<String> removeKeys = new ArrayList<>();
 				PaymentEntity paymentEntity = paymentRepository.findById(orderId);
 				try {
-					Response response = post(paymentEntity.getCallBackUrl(), "{}");
-					if(response.isSuccessful()){
-						removeKeys.add(paymentEntity.getOrderID());
+					//boolean isPaid = paymentService.isPaid(orderId, paymentEntity.getPaymentProvider());
+					boolean isPaid = true;
+
+					if(isPaid){
+						PaymentBody paymentBody = new PaymentBody();
+						paymentBody.setRemoteID(paymentEntity.getRemoteID());
+						ObjectMapper mapper = new ObjectMapper();
+						String value = mapper.writeValueAsString(paymentBody);
+						Response response = post(paymentEntity.getCallBackUrl(), value);
+						if(response.isSuccessful()){
+							paymentRepository.remove(paymentEntity.getOrderID());
+							removeJob(orderId);
+						}
 					}
-				} catch (IOException e) {
+				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} 
-
-				paymentRepository.removeAll(removeKeys);
 			}
-		}, TimeUnit.SECONDS.toSeconds(20)));
+		}, 30000));
 	}
 
 	public Response post(String url, String json) throws IOException {
@@ -65,5 +78,12 @@ public class PaymentScheduler {
 				.build();
 		Response response = client.newCall(request).execute();
 		return response;
+	}
+
+	public void removeJob(String orderId) {
+		ScheduledFuture<?> scheduledFuture = scheduledFutureMap.get(orderId);
+		if (scheduledFuture != null) {
+			scheduledFuture.cancel(false);
+		}
 	}
 }

@@ -18,7 +18,14 @@ public class PaymentEntity {
 	private Date created;
 	private Date lastUpdate;
 	private String callBackUrl;
+	private String item;
 
+	public String getItem() {
+		return item;
+	}
+	public void setItem(String item) {
+		this.item = item;
+	}
 	public String getCallBackUrl() {
 		return callBackUrl;
 	}

@@ -15,6 +15,12 @@ public class PaymentBody {
 	private String item;
 	private String status;
 	
+	public String getItem() {
+		return item;
+	}
+	public void setItem(String item) {
+		this.item = item;
+	}
 	public String getPaymentID() {
 		return paymentID;
 	}

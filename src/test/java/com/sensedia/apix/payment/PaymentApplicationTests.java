@@ -8,7 +8,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ComponentScan(basePackageClasses = Configuration.class)
+@ComponentScan(basePackageClasses = PaymentApplication.class)
 public class PaymentApplicationTests {
 
 	@Test

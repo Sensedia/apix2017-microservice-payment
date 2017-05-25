@@ -27,6 +27,10 @@ public class PaymentRepository {
 			paymentMap.remove(key);
 		});
 	}
+	
+	public void remove(String key) {
+		paymentMap.remove(key);
+	}
 
 	public PaymentEntity findById(String orderId) {
 		return paymentMap.get(orderId);
