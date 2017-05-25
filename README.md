@@ -9,6 +9,7 @@ Pré requisitos :
 git clone git@github.com:Sensedia/apix2017-microservice-payment.git
 
 ** Se estiver utilizando a vm do APIX pule o passo 2. **
+
 2- Execute o script que est na raiz
    ./install-sdk.sh
 
