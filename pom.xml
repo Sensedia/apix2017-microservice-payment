@@ -59,29 +59,29 @@
 			<version>2.9.9</version>
 		</dependency>
 		<dependency>
-		<groupId>io.swagger</groupId>
-		<artifactId>swagger-annotations</artifactId>
-		<version>${swagger-core-version}</version>
+		    <groupId>io.swagger</groupId>
+		    <artifactId>swagger-annotations</artifactId>
+		   <version>${swagger-core-version}</version>
 		</dependency>
 		<dependency>
-		<groupId>com.squareup.okhttp</groupId>
-		<artifactId>okhttp</artifactId>
-		<version>${okhttp-version}</version>
+		    <groupId>com.squareup.okhttp</groupId>
+		    <artifactId>okhttp</artifactId>
+		    <version>${okhttp-version}</version>
 		</dependency>
 		<dependency>
-		<groupId>com.squareup.okhttp</groupId>
-		<artifactId>logging-interceptor</artifactId>
-		<version>${okhttp-version}</version>
+		     <groupId>com.squareup.okhttp</groupId>
+		     <artifactId>logging-interceptor</artifactId>
+		     <version>${okhttp-version}</version>
 		</dependency>
 		<dependency>
-		<groupId>com.google.code.gson</groupId>
-		<artifactId>gson</artifactId>
-		<version>${gson-version}</version>
+		    <groupId>com.google.code.gson</groupId>
+		    <artifactId>gson</artifactId>
+		    <version>${gson-version}</version>
 		</dependency>
 		<dependency>
-		<groupId>joda-time</groupId>
-		<artifactId>joda-time</artifactId>
-		<version>${jodatime-version}</version>
+		    <groupId>joda-time</groupId>
+		    <artifactId>joda-time</artifactId>
+		    <version>${jodatime-version}</version>
 		</dependency>
 	</dependencies>
 
