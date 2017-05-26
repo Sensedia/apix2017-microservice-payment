@@ -16,7 +16,7 @@ import com.sensedia.apix.payment.entity.json.PaymentBody;
 import com.sensedia.apix.payment.service.PaymentService;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("/payments")
 public class PaymentController {
 
 	@Autowired
@@ -26,10 +26,16 @@ public class PaymentController {
 			produces =  MediaType.APPLICATION_JSON_VALUE )
 	@ResponseBody
 	public ResponseEntity<PaymentBody> createPayment(@RequestBody(required = true) PaymentBody paymentBodyRequest){
-		String paymentId = paymentService.createPayment(paymentBodyRequest);
+		String paymentId;
+		PaymentBody paymentBodyResponse;
+		try {
+			paymentId = paymentService.createPayment(paymentBodyRequest);
+			paymentBodyResponse = new PaymentBody();
+			paymentBodyResponse.setPaymentId(paymentId);
+		} catch (Exception e) {
+			paymentBodyResponse = new PaymentBody();
+		}
 
-		PaymentBody paymentBodyResponse = new PaymentBody();
-		paymentBodyResponse.setPaymentId(paymentId);
 		return new ResponseEntity<>(paymentBodyResponse, HttpStatus.CREATED);
 	}
 

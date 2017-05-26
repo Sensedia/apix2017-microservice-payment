@@ -27,7 +27,8 @@ public class LioService {
 	@Autowired
 	private OrderManagementApi apiInstance;
 
-	public String createPayment(PaymentEntity paymentEntity) {
+	public String createPayment(PaymentEntity paymentEntity) throws Exception {
+		
 		OrderItem orderItem = new OrderItem(); // OrderItem |
 		orderItem.setSku(UUID.randomUUID().toString());
 		orderItem.setName(paymentEntity.getItem());
@@ -37,41 +38,41 @@ public class LioService {
 		orderItem.setUpdatedAt(orderItem.getCreatedAt());
 
 		Order order = new Order(); // Order |
-		order.setReference("Order Chatbot");
+		order.setReference(paymentEntity.getRemoteID() + " - APIX Chatbot");
 		order.setId(UUID.randomUUID().toString());
 		order.setStatus(StatusEnum.DRAFT);
 		order.setCreatedAt(new DateTime());
 		order.setPrice(Integer.valueOf(paymentEntity.getAmount()));
 		order.setTransactions(new ArrayList<>());
 		order.setRemaining(null);
+		
 		try {	
 			Response orderResult = apiInstance.orderCreate(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order);
 			System.out.println(orderResult);
 			order.setId(orderResult.getId()); // String | Identificador do pedido.
 		} catch (ApiException e) {
-			System.err.println("Exception when calling OrderManagementApi#orderCreate");
-			e.printStackTrace();
+			throw new Exception("Error to create Order: "+ e.getMessage());
 		}
 		try {
 			Response orderItemResult = apiInstance.orderAddItem(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId(), orderItem);
 			System.out.println(orderItemResult);
 		} catch (ApiException e) {
-			System.err.println("Exception when calling OrderManagementApi#orderAddItem");
-			e.printStackTrace();
+			apiInstance.orderDelete(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId());
+			throw new Exception("Error to create Order Item: "+ e.getMessage());
 		}
 		
 		try {	
 			apiInstance.orderUpdate(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId(), "PLACE");
 		} catch (ApiException e) {
 			System.err.println("Exception when calling OrderManagementApi#orderCreate");
-			e.printStackTrace();
+			apiInstance.orderDelete(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId());
+			throw new Exception("Error to set Order Item: "+ e.getMessage());
 		}
 		
 		return order.getId();
 	}
 
 	public Object checkPaymentStatus(String orderId) {
-
 
 		OrderManagementApi apiInstance = new OrderManagementApi();
 
@@ -87,9 +88,10 @@ public class LioService {
 	}
 
 	public Boolean isPaid(PaymentEntity paymentEntity) {
+		
 		try {
 			Order orderItemResult = apiInstance.orderGet(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), paymentEntity.getOrderID());
-			return orderItemResult.getStatus().equals(StatusEnum.APPROVED);
+			return orderItemResult.getStatus().equals(StatusEnum.PAID);
 		} catch (ApiException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

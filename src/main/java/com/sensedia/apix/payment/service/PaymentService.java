@@ -24,15 +24,19 @@ public class PaymentService {
 	@Autowired
 	private PaymentScheduler paymentScheduler;
 
-	public String createPayment(PaymentBody paymentBody) {
+	public String createPayment(PaymentBody paymentBody) throws Exception {
 		PaymentEntity paymentEntity = new PaymentEntity();
 
 		switch(paymentBody.getPaymentProvider()){
 		case CIELO_LIO:
 			BeanUtils.copyProperties(paymentBody, paymentEntity);
-			paymentEntity.setOrderID(lioService.createPayment(paymentEntity));
-			paymentRepository.createOrUpdate(paymentEntity);
-			paymentScheduler.createJob(paymentEntity.getOrderID());
+			try {
+				paymentEntity.setOrderID(lioService.createPayment(paymentEntity));
+				paymentRepository.createOrUpdate(paymentEntity);
+				paymentScheduler.createJob(paymentEntity.getOrderID());
+			} catch (Exception e) {
+				throw new Exception("Create payment error: "+ e.getMessage());
+			}
 			
 			break;
 			
