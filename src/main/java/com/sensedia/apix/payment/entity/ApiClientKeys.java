@@ -12,7 +12,7 @@ import io.swagger.client.auth.ApiKeyAuth;
 @Component
 public class ApiClientKeys {
 	
-	private ApiClient defaultClient; 
+	private ApiClient defaultClient;
 	
 	private ApiKeyAuth merchantId;
 	private ApiKeyAuth accessToken;
@@ -32,6 +32,7 @@ public class ApiClientKeys {
 	
 	public ApiClientKeys(){
 		defaultClient = Configuration.getDefaultApiClient();
+		defaultClient.setConnectTimeout(30000);
 
 		// Configure API key authorization: merchant-id
 		merchantId = (ApiKeyAuth) defaultClient.getAuthentication("merchant-id");

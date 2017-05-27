@@ -26,14 +26,12 @@ public class PaymentService {
 
 	public String createPayment(PaymentBody paymentBody) throws Exception {
 		PaymentEntity paymentEntity = new PaymentEntity();
+		BeanUtils.copyProperties(paymentBody, paymentEntity);
 
 		switch(paymentBody.getPaymentProvider()){
-		case CIELO_LIO:
-			BeanUtils.copyProperties(paymentBody, paymentEntity);
+		case CIELO_LIO:			
 			try {
 				paymentEntity.setOrderID(lioService.createPayment(paymentEntity));
-				paymentRepository.createOrUpdate(paymentEntity);
-				paymentScheduler.createJob(paymentEntity.getOrderID());
 			} catch (Exception e) {
 				throw new Exception("Create payment error: "+ e.getMessage());
 			}
@@ -41,36 +39,34 @@ public class PaymentService {
 			break;
 			
 		case VISA_CHECKOUT:
-			//visaService.createPayment(paymentEntity);
-			//paymentRepository.createOrUpdate(paymentEntity);
+			paymentRepository.createOrUpdate(paymentEntity);
 			
 			break;
 			
 		default:
-			
+			paymentRepository.createOrUpdate(paymentEntity);
+			paymentScheduler.createJob(paymentEntity.getOrderID());
 		}
 		
 		return paymentEntity.getOrderID();
 	}
 
-	public PaymentEntity checkPaymentStatus(String id) {
-		PaymentEntity paymentEntity = new PaymentEntity();
-		paymentEntity.setStatus("PAID");
+	public PaymentEntity checkPaymentStatus(String orderId) {
+		PaymentEntity paymentEntity = paymentRepository.findById(orderId);
 		return paymentEntity;
 	}
 
 	public Boolean isPaid(String orderId, PaymentProviderEnum paymentProviderEnum) {
 		Boolean paid = false;
+		PaymentEntity paymentEntity = paymentRepository.findById(orderId);
 		
 		switch(paymentProviderEnum){
 		case CIELO_LIO:
-			PaymentEntity paymentEntity = paymentRepository.findById(orderId);
 			paid = lioService.isPaid(paymentEntity);
 			break;
 			
 		case VISA_CHECKOUT:
-			//visaService.createPayment(paymentEntity);
-			//paymentRepository.createOrUpdate(paymentEntity);
+			paid = visaService.isPaid(paymentEntity);
 			break;
 			
 		default:

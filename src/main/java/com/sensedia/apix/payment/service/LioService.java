@@ -48,14 +48,12 @@ public class LioService {
 		
 		try {	
 			Response orderResult = apiInstance.orderCreate(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order);
-			System.out.println(orderResult);
 			order.setId(orderResult.getId()); // String | Identificador do pedido.
 		} catch (ApiException e) {
 			throw new Exception("Error to create Order: "+ e.getMessage());
 		}
 		try {
-			Response orderItemResult = apiInstance.orderAddItem(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId(), orderItem);
-			System.out.println(orderItemResult);
+			apiInstance.orderAddItem(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId(), orderItem);
 		} catch (ApiException e) {
 			apiInstance.orderDelete(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId());
 			throw new Exception("Error to create Order Item: "+ e.getMessage());
@@ -64,7 +62,7 @@ public class LioService {
 		try {	
 			apiInstance.orderUpdate(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId(), "PLACE");
 		} catch (ApiException e) {
-			System.err.println("Exception when calling OrderManagementApi#orderCreate");
+			System.err.println("Exception when calling OrderManagementApi#orderUpdate");
 			apiInstance.orderDelete(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId());
 			throw new Exception("Error to set Order Item: "+ e.getMessage());
 		}

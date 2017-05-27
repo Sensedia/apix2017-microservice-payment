@@ -7,7 +7,7 @@ import com.sensedia.apix.payment.entity.PaymentEntity;
 @Service
 public class VisaService {
 
-	public String createPayment(PaymentEntity paymentEntity) {
+	public Boolean isPaid(PaymentEntity paymentEntity) {
 		// TODO Auto-generated method stub
 		return null;
 	}

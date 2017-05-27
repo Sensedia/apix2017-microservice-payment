@@ -3,6 +3,7 @@ package com.sensedia.apix.payment.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class PaymentRepository {
 	}
 	
 	public void createOrUpdate(PaymentEntity payment){
+		payment.setOrderID(UUID.randomUUID().toString());
 		paymentMap.put(payment.getOrderID(), payment);
 	}
 

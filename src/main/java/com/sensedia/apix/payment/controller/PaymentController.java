@@ -32,11 +32,12 @@ public class PaymentController {
 			paymentId = paymentService.createPayment(paymentBodyRequest);
 			paymentBodyResponse = new PaymentBody();
 			paymentBodyResponse.setPaymentId(paymentId);
+			
+			return new ResponseEntity<>(paymentBodyResponse, HttpStatus.CREATED);
+			
 		} catch (Exception e) {
-			paymentBodyResponse = new PaymentBody();
+			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
 		}
-
-		return new ResponseEntity<>(paymentBodyResponse, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(path = "/{id}/status/", method = RequestMethod.GET, produces =  MediaType.APPLICATION_JSON_VALUE )
