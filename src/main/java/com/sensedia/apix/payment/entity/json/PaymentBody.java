@@ -10,11 +10,18 @@ public class PaymentBody {
 	private PaymentProviderEnum paymentProvider;
 	private String amount;
 	private String paymentID;
+	private String orderID;
 	private String remoteID;
 	private String callBackUrl;
 	private String item;
 	private String status;
 	
+	public String getOrderID() {
+		return orderID;
+	}
+	public void setOrderID(String orderID) {
+		this.orderID = orderID;
+	}
 	public String getItem() {
 		return item;
 	}

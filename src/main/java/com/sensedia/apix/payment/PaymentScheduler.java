@@ -45,18 +45,22 @@ public class PaymentScheduler {
 			public void run() {
 				PaymentEntity paymentEntity = paymentRepository.findById(orderId);
 				try {
-					boolean isPaid = paymentService.isPaid(orderId, paymentEntity.getPaymentProvider());
+					if(paymentEntity != null){
+						boolean isPaid = paymentService.isPaid(orderId, paymentEntity.getPaymentProvider());
 
-					if(isPaid){
-						PaymentBody paymentBody = new PaymentBody();
-						paymentBody.setRemoteID(paymentEntity.getRemoteID());
-						ObjectMapper mapper = new ObjectMapper();
-						String value = mapper.writeValueAsString(paymentBody);
-						Response response = post(paymentEntity.getCallBackUrl(), value);
-						if(response.isSuccessful()){
-							paymentRepository.remove(paymentEntity.getOrderID());
-							removeJob(orderId);
+						if(isPaid){
+							PaymentBody paymentBody = new PaymentBody();
+							paymentBody.setRemoteID(paymentEntity.getRemoteID());
+							ObjectMapper mapper = new ObjectMapper();
+							String value = mapper.writeValueAsString(paymentBody);
+							Response response = post(paymentEntity.getCallBackUrl(), value);
+							if(response.isSuccessful()){
+								paymentRepository.remove(paymentEntity.getOrderID());
+								removeJob(orderId);
+							}
 						}
+					}else{
+						removeJob(orderId);
 					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block

@@ -1,6 +1,21 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head> 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script type="text/javascript">
+     function sendPayment(){
+    	 
+    	 var dataJson = {"paymentProvider":"VISA_CHECKOUT","paymentID": window.location.search.substring(1).split('=')[1]};
+    	 
+    	 $.ajax({
+    		    type: 'PUT',
+    		    //url: 'http://apix.sensedia.com/payments',
+    		    url: 'http://localhost:8080/payments',
+    		    data: JSON.stringify (dataJson),
+    		    success: function(data) { console.log('data: ' + data); },
+    		    contentType: "application/json",
+    		    dataType: 'json'
+    		});
+     }
      function onVisaCheckoutReady(){
 	     V.init( {
 		     apikey: "0TBY6KED0SCKIR9VNL3421NBHeF6lXKQ79nT5qlq1H3ukVEec",
@@ -10,13 +25,16 @@
 		     }
 	     });
 	     V.on("payment.success", function(payment){
-	    	 alert(JSON.stringify(payment)); 
+	    	 console.log(JSON.stringify(payment));
+	    	 sendPayment()
 	     });
 	     V.on("payment.cancel", function(payment){
-	    	 alert(JSON.stringify(payment)); 
+	    	 console.log('Pagamento cancelado.');
+	    	 sendPayment()
 	     });
 	     V.on("payment.error", function(payment, error){
-	    	 alert(JSON.stringify(error)); 
+	    	 console.log('Erro ao realizar pagamento.');
+	    	 sendPayment()
 	     });
      }
   </script>

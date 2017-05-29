@@ -14,13 +14,15 @@ import com.sensedia.apix.payment.entity.PaymentEntity;
 public class PaymentRepository {
 
 	private Map<String, PaymentEntity> paymentMap = new ConcurrentHashMap<>();
-	
+
 	public Collection<PaymentEntity> findAll(){
 		return paymentMap.values();
 	}
-	
+
 	public void createOrUpdate(PaymentEntity payment){
-		payment.setOrderID(UUID.randomUUID().toString());
+		if(payment.getOrderID() == null){
+			payment.setOrderID(UUID.randomUUID().toString());
+		}
 		paymentMap.put(payment.getOrderID(), payment);
 	}
 
@@ -29,7 +31,7 @@ public class PaymentRepository {
 			paymentMap.remove(key);
 		});
 	}
-	
+
 	public void remove(String key) {
 		paymentMap.remove(key);
 	}

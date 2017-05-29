@@ -28,26 +28,16 @@ public class PaymentService {
 		PaymentEntity paymentEntity = new PaymentEntity();
 		BeanUtils.copyProperties(paymentBody, paymentEntity);
 
-		switch(paymentBody.getPaymentProvider()){
-		case CIELO_LIO:			
+		if(PaymentProviderEnum.CIELO_LIO.equals(paymentBody.getPaymentProvider())){
 			try {
 				paymentEntity.setOrderID(lioService.createPayment(paymentEntity));
 			} catch (Exception e) {
 				throw new Exception("Create payment error: "+ e.getMessage());
 			}
-			
-			break;
-			
-		case VISA_CHECKOUT:
-			paymentRepository.createOrUpdate(paymentEntity);
-			
-			break;
-			
-		default:
-			paymentRepository.createOrUpdate(paymentEntity);
-			paymentScheduler.createJob(paymentEntity.getOrderID());
 		}
-		
+
+		paymentRepository.createOrUpdate(paymentEntity);
+		paymentScheduler.createJob(paymentEntity.getOrderID());
 		return paymentEntity.getOrderID();
 	}
 
@@ -59,21 +49,36 @@ public class PaymentService {
 	public Boolean isPaid(String orderId, PaymentProviderEnum paymentProviderEnum) {
 		Boolean paid = false;
 		PaymentEntity paymentEntity = paymentRepository.findById(orderId);
-		
+
 		switch(paymentProviderEnum){
 		case CIELO_LIO:
 			paid = lioService.isPaid(paymentEntity);
 			break;
-			
+
 		case VISA_CHECKOUT:
 			paid = visaService.isPaid(paymentEntity);
 			break;
-			
+
 		default:
-			
+
 		}
-		
+
 		return paid;
+	}
+
+	public String updatePayment(PaymentBody paymentBodyRequest) {
+		PaymentEntity paymentEntity = paymentRepository.findById(paymentBodyRequest.getOrderID());
+		if(paymentEntity != null){
+			paymentRepository.createOrUpdate(paymentEntity);
+
+			if(PaymentProviderEnum.VISA_CHECKOUT.equals(paymentBodyRequest.getPaymentProvider())){
+				paymentScheduler.createJob(paymentEntity.getOrderID());
+				paymentEntity.setStatus("PAID");
+			}
+			return paymentEntity.getOrderID();
+		}
+
+		return null;
 	}
 
 }

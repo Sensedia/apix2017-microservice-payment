@@ -39,6 +39,27 @@ public class PaymentController {
 			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
 		}
 	}
+	
+	@RequestMapping(method = RequestMethod.PUT, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE},
+			produces =  MediaType.APPLICATION_JSON_VALUE )
+	@ResponseBody
+	public ResponseEntity<PaymentBody> updatePayment(@RequestBody(required = true) PaymentBody paymentBodyRequest){
+		String paymentId;
+		PaymentBody paymentBodyResponse;
+		try {
+			paymentBodyRequest.setOrderID(paymentBodyRequest.getPaymentID());
+			
+			paymentId = paymentService.updatePayment(paymentBodyRequest);
+			paymentBodyResponse = new PaymentBody();
+			paymentBodyResponse.setPaymentId(paymentId);
+			
+			return new ResponseEntity<>(paymentBodyResponse, HttpStatus.CREATED);
+			
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
+		}
+	}
+	
 
 	@RequestMapping(path = "/{id}/status/", method = RequestMethod.GET, produces =  MediaType.APPLICATION_JSON_VALUE )
 	@ResponseBody
