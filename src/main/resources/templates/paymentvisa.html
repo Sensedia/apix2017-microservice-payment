@@ -8,8 +8,8 @@
     	 
     	 $.ajax({
     		    type: 'PUT',
-    		    //url: 'http://apix.sensedia.com/payments',
-    		    url: 'http://localhost:8080/payments',
+    		    url: 'http://apix.sensedia.com/payments',
+    		    //url: 'http://localhost:8080/payments',
     		    data: JSON.stringify (dataJson),
     		    success: function(data) { console.log('data: ' + data); },
     		    contentType: "application/json",
