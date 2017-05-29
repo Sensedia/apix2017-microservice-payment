@@ -49,11 +49,7 @@ public class PaymentScheduler {
 						boolean isPaid = paymentService.isPaid(orderId, paymentEntity.getPaymentProvider());
 
 						if(isPaid){
-							PaymentBody paymentBody = new PaymentBody();
-							paymentBody.setRemoteID(paymentEntity.getRemoteID());
-							ObjectMapper mapper = new ObjectMapper();
-							String value = mapper.writeValueAsString(paymentBody);
-							Response response = post(paymentEntity.getCallBackUrl(), value);
+							Response response = get(paymentEntity.getCallBackUrl());
 							if(response.isSuccessful()){
 								paymentRepository.remove(paymentEntity.getOrderID());
 								removeJob(orderId);
@@ -70,11 +66,10 @@ public class PaymentScheduler {
 		}, 30000));
 	}
 
-	public Response post(String url, String json) throws IOException {
-		RequestBody body = RequestBody.create(JSON, json);
+	public Response get(String url) throws IOException {
 		Request request = new Request.Builder()
 				.url(url)
-				.post(body)
+				.get()
 				.build();
 		Response response = client.newCall(request).execute();
 		return response;

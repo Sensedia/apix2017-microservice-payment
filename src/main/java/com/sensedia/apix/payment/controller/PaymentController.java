@@ -1,5 +1,8 @@
 package com.sensedia.apix.payment.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,6 +63,28 @@ public class PaymentController {
 		}
 	}
 	
+	@RequestMapping(path="/orders/{orderId}" , method = RequestMethod.GET, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE},
+			produces =  MediaType.APPLICATION_JSON_VALUE )
+	@ResponseBody
+	public ResponseEntity<List> getPayments(@PathVariable String orderId){
+		return new ResponseEntity<>(getOrders(orderId), HttpStatus.OK);
+	}
+	
+	@RequestMapping(path="/orders/" , method = RequestMethod.GET, consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE},
+			produces =  MediaType.APPLICATION_JSON_VALUE )
+	@ResponseBody
+	public ResponseEntity<List> getPayment(){
+		return new ResponseEntity<>(getOrders(null), HttpStatus.OK);	
+	}
+	
+	
+	private List getOrders(String orderId){
+		List payments = paymentService.getPayments(orderId);
+		if(payments == null){
+			payments = new ArrayList<>();
+		}
+		return payments;
+	}
 
 	@RequestMapping(path = "/{id}/status/", method = RequestMethod.GET, produces =  MediaType.APPLICATION_JSON_VALUE )
 	@ResponseBody

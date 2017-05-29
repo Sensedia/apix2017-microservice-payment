@@ -1,5 +1,6 @@
 package com.sensedia.apix.payment.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -38,5 +39,18 @@ public class PaymentRepository {
 
 	public PaymentEntity findById(String orderId) {
 		return paymentMap.get(orderId);
+	}
+
+	public List getPayments(String orderId) {
+		List payments = new ArrayList<>();
+		
+		if(orderId != null){
+			payments = new ArrayList<>();
+			payments.add(paymentMap.get(orderId));
+		}else{
+			payments = new ArrayList<>(paymentMap.values());
+		}
+		
+		return payments;
 	}
 }
