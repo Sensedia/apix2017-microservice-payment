@@ -8,7 +8,10 @@
     	 
     	 $.ajax({
     		    type: 'PUT',
-    		    url: 'http://apix.sensedia.com/payments',
+    		    url: 'http://apix.sensedia.com/api/v1/payments',
+    		    headers: {
+    		    	client_id: '1fb156aa-de4b-317e-97bf-77319367b43b'
+    		    },
     		    //url: 'http://localhost:8080/payments',
     		    data: JSON.stringify (dataJson),
     		    success: function(data) { console.log('data: ' + data); },
