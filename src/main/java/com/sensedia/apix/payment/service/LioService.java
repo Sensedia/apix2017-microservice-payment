@@ -120,7 +120,7 @@ public class LioService {
 	public Boolean isPaid(PaymentEntity paymentEntity) {
 		
 		try {
-			com.squareup.okhttp.Response response = get(alternativebasePath + "/orders/"+paymentEntity.getOrderID(),apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId()).body().string();
+			com.squareup.okhttp.Response response = get(alternativebasePath + "/orders/"+paymentEntity.getOrderID(),apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId());
 			//Order orderItemResult = apiInstance.orderGet(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), paymentEntity.getOrderID());
 			return response.body().string().contains(StatusEnum.PAID.toString());
 		} catch (IOException e) {
