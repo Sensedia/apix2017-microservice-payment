@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.sensedia.apix.payment.entity.ApiClientKeys;
@@ -31,6 +32,9 @@ public class LioService {
 	
 	@Autowired
 	private OrderManagementApi apiInstance;
+	
+	@Value("${base-path}")
+	private String basePath;
 	
 	private OkHttpClient client = new OkHttpClient();
 
@@ -64,7 +68,7 @@ public class LioService {
 		
 		try {	
 			//apiInstance.orderUpdate(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId(), "PLACE");
-			com.squareup.okhttp.Response response = put("https://cielo-order-manager.m4u.com.br/api/v2/orders/"+order.getId()+"?operation=PLACE",apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId());
+			com.squareup.okhttp.Response response = put(basePath+"/orders/"+order.getId()+"?operation=PLACE",apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId());
 		} catch (IOException e) {
 			System.err.println("Exception when calling OrderManagementApi#orderUpdate");
 			apiInstance.orderDelete(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId());
