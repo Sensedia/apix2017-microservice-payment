@@ -63,7 +63,7 @@ public class PaymentScheduler {
 					e.printStackTrace();
 				} 
 			}
-		}, 30000));
+		}, 10000));
 	}
 
 	public Response get(String url) throws IOException {

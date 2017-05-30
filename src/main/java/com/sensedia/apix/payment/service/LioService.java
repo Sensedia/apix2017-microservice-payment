@@ -1,5 +1,6 @@
 package com.sensedia.apix.payment.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -9,6 +10,10 @@ import org.springframework.stereotype.Service;
 
 import com.sensedia.apix.payment.entity.ApiClientKeys;
 import com.sensedia.apix.payment.entity.PaymentEntity;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 
 import io.swagger.client.ApiException;
 import io.swagger.client.api.OrderManagementApi;
@@ -26,6 +31,8 @@ public class LioService {
 	
 	@Autowired
 	private OrderManagementApi apiInstance;
+	
+	private OkHttpClient client = new OkHttpClient();
 
 	public String createPayment(PaymentEntity paymentEntity) throws Exception {
 		
@@ -45,6 +52,8 @@ public class LioService {
 		order.setPrice(Integer.valueOf(paymentEntity.getAmount()));
 		order.setTransactions(new ArrayList<>());
 		order.setRemaining(null);
+		order.setItems(new ArrayList<>());
+		order.getItems().add(orderItem);
 		
 		try {	
 			Response orderResult = apiInstance.orderCreate(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order);
@@ -52,22 +61,29 @@ public class LioService {
 		} catch (ApiException e) {
 			throw new Exception("Error to create Order: "+ e.getMessage());
 		}
-		try {
-			apiInstance.orderAddItem(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId(), orderItem);
-		} catch (ApiException e) {
-			apiInstance.orderDelete(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId());
-			throw new Exception("Error to create Order Item: "+ e.getMessage());
-		}
 		
 		try {	
-			apiInstance.orderUpdate(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId(), "PLACE");
-		} catch (ApiException e) {
+			//apiInstance.orderUpdate(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId(), "PLACE");
+			com.squareup.okhttp.Response response = put("https://cielo-order-manager.m4u.com.br/api/v2/orders/"+order.getId()+"?operation=PLACE",apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId());
+		} catch (IOException e) {
 			System.err.println("Exception when calling OrderManagementApi#orderUpdate");
 			apiInstance.orderDelete(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId());
 			throw new Exception("Error to set Order Item: "+ e.getMessage());
 		}
 		
 		return order.getId();
+	}
+	
+	public com.squareup.okhttp.Response put(String url, String cliendId, String accessToken, String merchantId) throws IOException {
+		Request request = new Request.Builder()
+				.url(url)
+				.header("Merchant-ID", merchantId)
+				.header("Access-Token", accessToken)
+				.header("Client-Id", cliendId)
+				.put(RequestBody.create(MediaType.parse("application/json"), ""))
+				.build();
+		com.squareup.okhttp.Response response = client.newCall(request).execute();
+		return response;
 	}
 
 	public Object checkPaymentStatus(String orderId) {
