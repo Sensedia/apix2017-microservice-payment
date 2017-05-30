@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.sensedia.apix.payment.entity.ApiClientKeys;
@@ -31,6 +32,9 @@ public class LioService {
 	
 	@Autowired
 	private OrderManagementApi apiInstance;
+	
+	@Value("${alternative-path}")
+	private String alternativebasePath;
 	
 	private OkHttpClient client = new OkHttpClient();
 
@@ -64,7 +68,7 @@ public class LioService {
 		
 		try {	
 			//apiInstance.orderUpdate(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId(), "PLACE");
-			com.squareup.okhttp.Response response = put("https://cielo-order-manager.m4u.com.br/api/v2/orders/"+order.getId()+"?operation=PLACE",apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId());
+			com.squareup.okhttp.Response response = put(alternativebasePath + "/orders/"+order.getId()+"?operation=PLACE",apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId());
 		} catch (IOException e) {
 			System.err.println("Exception when calling OrderManagementApi#orderUpdate");
 			apiInstance.orderDelete(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), order.getId());
@@ -81,6 +85,18 @@ public class LioService {
 				.header("Access-Token", accessToken)
 				.header("Client-Id", cliendId)
 				.put(RequestBody.create(MediaType.parse("application/json"), ""))
+				.build();
+		com.squareup.okhttp.Response response = client.newCall(request).execute();
+		return response;
+	}
+	
+	public com.squareup.okhttp.Response get(String url, String cliendId, String accessToken, String merchantId) throws IOException {
+		Request request = new Request.Builder()
+				.url(url)
+				.header("Merchant-ID", merchantId)
+				.header("Access-Token", accessToken)
+				.header("Client-Id", cliendId)
+				.get()
 				.build();
 		com.squareup.okhttp.Response response = client.newCall(request).execute();
 		return response;
@@ -104,9 +120,10 @@ public class LioService {
 	public Boolean isPaid(PaymentEntity paymentEntity) {
 		
 		try {
-			Order orderItemResult = apiInstance.orderGet(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), paymentEntity.getOrderID());
-			return orderItemResult.getStatus().equals(StatusEnum.PAID);
-		} catch (ApiException e) {
+			com.squareup.okhttp.Response response = get(alternativebasePath + "/orders/"+paymentEntity.getOrderID(),apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId()).body().string();
+			//Order orderItemResult = apiInstance.orderGet(apiClientKeys.getClientId(), apiClientKeys.getAccessToken(), apiClientKeys.getMerchantId(), paymentEntity.getOrderID());
+			return response.body().string().contains(StatusEnum.PAID.toString());
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
